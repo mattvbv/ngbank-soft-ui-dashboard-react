@@ -38,6 +38,7 @@ import typography from "assets/theme/base/typography";
 import BuildByDevelopers from "layouts/dashboard/components/BuildByDevelopers";
 import WorkWithTheRockets from "layouts/dashboard/components/WorkWithTheRockets";
 import Projects from "layouts/dashboard/components/Projects";
+import Positions from "layouts/dashboard2/components/Positions";
 import OrderOverview from "layouts/dashboard/components/OrderOverview";
 
 // Data
@@ -95,23 +96,7 @@ function Dashboard() {
         </SoftBox>
 
         <SoftBox mb={3}>
-          <Card>
-            <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
-              <SoftTypography variant="h6">Positions table</SoftTypography>
-            </SoftBox>
-            <SoftBox
-              sx={{
-                "& .MuiTableRow-root:not(:last-child)": {
-                  "& td": {
-                    borderBottom: ({ borders: { borderWidth, borderColor } }) =>
-                      `${borderWidth[1]} solid ${borderColor}`,
-                  },
-                },
-              }}
-            >
-              <Table columns={posCols} rows={posRows} />
-            </SoftBox>
-          </Card> 
+          <Positions /> 
         </SoftBox>
 
 
