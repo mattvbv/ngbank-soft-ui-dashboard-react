@@ -13,9 +13,9 @@ Coded by www.creative-tim.com
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-import { useState } from "react";
 
 // @mui material components
+import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
 import Menu from "@mui/material/Menu";
@@ -24,33 +24,31 @@ import MenuItem from "@mui/material/MenuItem";
 // Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
+import MiniStatisticsCard from "examples/Cards/StatisticsCards/MiniStatisticsCard";
 
 // Soft UI Dashboard Materail-UI example components
 import Table from "examples/Tables/Table";
 
-// Data
-import data from "layouts/dashboard2/components/Positions/data";
+import React, { useState, useEffect } from 'react';
 
-function Positions() {
-  const { columns, rows } = data();
-  const [menu, setMenu] = useState(null);
+// Data
+import data from "layouts/dashboard2/components/PortfolioMini/data";
+
+function PortfolioMini() {
+  const { portfolio } = data();
+
+  const value = portfolio?.value || 0
 
   return (
-    <Card>
-      <SoftBox
-        sx={{
-          "& .MuiTableRow-root:not(:last-child)": {
-            "& td": {
-              borderBottom: ({ borders: { borderWidth, borderColor } }) =>
-                `${borderWidth[1]} solid ${borderColor}`,
-            },
-          },
-        }}
-      >
-        <Table columns={columns} rows={rows} />
-      </SoftBox>
-    </Card>
+    <Grid item xs={12} sm={6} xl={3}>
+      <MiniStatisticsCard
+        title={{ text: "Portfolio value" }}
+        count={value}
+        percentage={{ color: "success", text: "+55%" }}
+        icon={{ color: "info", component: "paid" }}
+      />
+    </Grid>
   );
 }
 
-export default Positions;
+export default PortfolioMini;
