@@ -48,7 +48,9 @@ function PortfolioMini() {
     // Reset the flashing animation after 1 second (duration of animation)
     const timer = setTimeout(() => {
       setFlashing(false);
-    }, 4000); // Flash duration
+    }, 1000); // Flash duration
+
+    console.log("After flashing reset");
 
     return () => clearTimeout(timer); // Cleanup on unmount or re-renders
   }, [portfolio?.value]);
@@ -59,7 +61,7 @@ function PortfolioMini() {
         title={{ text: "Portfolio value" }}
         count={(
           <span className={flashing ? 'flash-green' : ''}>
-            {value}
+            {parseFloat(value).toFixed(2)}
           </span>
         )}
         percentage={{ color: "success", text: "+55%" }}

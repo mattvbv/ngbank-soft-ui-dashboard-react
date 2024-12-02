@@ -147,7 +147,7 @@ export default function data() {
         fontWeight="medium"
         className={row.id === updatedRowId ? "flash-green" : ""}
       >
-        ${row.averagePrice}
+        {parseFloat(row.averagePrice).toFixed(2)}
       </SoftTypography>
     ),
     lastKnownPrice: (
@@ -157,7 +157,7 @@ export default function data() {
         fontWeight="medium"
         className={row.id === updatedRowId ? "flash-green" : ""}
       >
-        ${row.lastKnownPrice}
+        {parseFloat(row.lastKnownPrice).toFixed(2)}
       </SoftTypography>
     ),
   }));
