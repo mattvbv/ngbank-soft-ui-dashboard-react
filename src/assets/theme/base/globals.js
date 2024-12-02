@@ -36,6 +36,28 @@ const globals = {
   "a.link:hover, .link:hover, a.link:focus, .link:focus": {
     color: `${info.main} !important`,
   },
+
+  // Add the flash-green class here
+  ".flash-green": {
+    animation: "flashGreen 1s ease-out",
+  },
+  // Define the keyframes animation for flashing effect
+  "@keyframes flashGreen": {
+    "0%": {
+      color: "green",
+      backgroundColor: "#e8f5e9", // Light green background
+    },
+    "50%": {
+      color: "darkgreen",
+      backgroundColor: "#c8e6c9", // Slightly darker green
+    },
+    "100%": {
+      color: "green",
+      backgroundColor: "white", // Reset background color
+    },
+  },
+
+  
 };
 
 export default globals;

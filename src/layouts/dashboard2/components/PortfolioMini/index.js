@@ -36,14 +36,32 @@ import data from "layouts/dashboard2/components/PortfolioMini/data";
 
 function PortfolioMini() {
   const { portfolio } = data();
+  const value = portfolio?.value || 0;
+  const [flashing, setFlashing] = useState(false);
 
-  const value = portfolio?.value || 0
+  useEffect(() => {
+    // When the value changes, trigger the flashing animation
+    console.log("Before flashing");
+    setFlashing(true);
+    console.log("In mini");
+
+    // Reset the flashing animation after 1 second (duration of animation)
+    const timer = setTimeout(() => {
+      setFlashing(false);
+    }, 4000); // Flash duration
+
+    return () => clearTimeout(timer); // Cleanup on unmount or re-renders
+  }, [portfolio?.value]);
 
   return (
     <Grid item xs={12} sm={6} xl={3}>
       <MiniStatisticsCard
         title={{ text: "Portfolio value" }}
-        count={value}
+        count={(
+          <span className={flashing ? 'flash-green' : ''}>
+            {value}
+          </span>
+        )}
         percentage={{ color: "success", text: "+55%" }}
         icon={{ color: "info", component: "paid" }}
       />

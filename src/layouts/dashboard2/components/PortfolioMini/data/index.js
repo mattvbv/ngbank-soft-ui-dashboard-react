@@ -56,6 +56,37 @@ export default function data() {
     // // Cleanup interval on unmount
     // return () => clearInterval(intervalId);
 
+    // SSE Connection
+    const eventSource = new EventSource("http://localhost:8082/sse/portfolios/10000");
+
+    eventSource.onmessage = (event) => {
+      console.log("Received SSE data:", event.data);
+      try {
+        const updatedData = JSON.parse(event.data); // Assuming SSE data is JSON
+        if (updatedData.value !== undefined) {
+          // Update only the 'value' attribute of the portfolio
+          setPortfolio((prevPortfolio) => ({
+            ...prevPortfolio,
+            value: updatedData.value,
+          }));
+          console.log("Portfolio value updated:", updatedData.value);
+        }
+      } catch (err) {
+        console.error("Error parsing SSE data:", err);
+      }
+    };
+
+    eventSource.onerror = (err) => {
+      console.error("Error with SSE connection:", err);
+      setError("SSE connection failed");
+      eventSource.close(); // Close the connection on error
+    };
+
+    // Cleanup SSE connection on unmount
+    return () => {
+      eventSource.close();
+    };
+
 
   }, []);
 
