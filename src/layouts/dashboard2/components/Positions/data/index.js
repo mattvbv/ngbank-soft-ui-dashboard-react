@@ -19,45 +19,34 @@ import team2 from "assets/images/team-2.jpg";
 import team3 from "assets/images/team-3.jpg";
 import team4 from "assets/images/team-4.jpg";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 export default function data() {
-
   const [rows, setRows] = useState([]);
+  const [updatedRowId, setUpdatedRowId] = useState(null); // Track the updated row ID for flashing
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const logos = [logoXD, logoAtlassian, logoSlack, logoSpotify, logoJira, logoInvesion];
+
+  // Utility function to get a random logo
+  const getRandomLogo = () => logos[Math.floor(Math.random() * logos.length)];
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        console.log("Fetching data");
         const response = await fetch("http://localhost:8082/portfolios/10000/positions");
-        console.log("Request sent");
-        console.log("Response ok ? " + response.ok);
         if (!response.ok) throw new Error("Failed to fetch data");
-        console.log("Getting json");
         const data = await response.json();
-        console.log("Data fetched");
 
         // Map the fetched data to the format expected by the table
         const formattedRows = data.map((item) => ({
-          ticker: [item.logo || logoSpotify, item.ticker],
-          quantity: (
-            <SoftTypography variant="button" color="text" fontWeight="medium">
-              {item.quantity}
-            </SoftTypography>
-          ),
-          averagePrice: (
-            <SoftTypography variant="button" color="text" fontWeight="medium">
-              ${item.averagePrice}
-            </SoftTypography>
-          ),
-          lastKnownPrice: (
-            <SoftTypography variant="button" color="text" fontWeight="medium">
-              ${item.lastKnownPrice}
-            </SoftTypography>
-          ),
+          id: item.id, // Add a unique identifier
+          ticker: [getRandomLogo(), item.ticker],
+          quantity: item.quantity,
+          averagePrice: item.averagePrice,
+          lastKnownPrice: item.lastKnownPrice,
         }));
         setRows(formattedRows);
       } catch (err) {
@@ -68,6 +57,59 @@ export default function data() {
     };
 
     fetchData();
+
+    // Set up SSE connection
+    const eventSource = new EventSource("http://localhost:8082/sse/portfolios/10000/positions");
+
+    eventSource.onmessage = (event) => {
+      const updatedPosition = JSON.parse(event.data); // Assuming SSE data is JSON
+      console.log("Received SSE update:", updatedPosition);
+
+
+      setRows((prevRows) => {
+        const existingRowIndex = prevRows.findIndex((row) => row.id === updatedPosition.id);
+      
+        if (existingRowIndex !== -1) {
+          // Update the existing row
+          return prevRows.map((row) =>
+            row.id === updatedPosition.id
+              ? {
+                  ...row,
+                  ...updatedPosition,
+                  ticker: [
+                    row.ticker[0], // Preserve the existing logo
+                    updatedPosition.ticker || row.ticker[1], // Update ticker name if provided
+                  ],
+                }
+              : row
+          );
+        } else {
+          // Add new row
+          return [
+            ...prevRows,
+            {
+              id: updatedPosition.id,
+              ticker: [getRandomLogo(), updatedPosition.ticker], // Assign a random logo only for new rows
+              quantity: updatedPosition.quantity,
+              averagePrice: updatedPosition.averagePrice,
+              lastKnownPrice: updatedPosition.lastKnownPrice,
+            },
+          ];
+        }
+      });
+
+      // Trigger flash effect for the updated or newly added row
+      setUpdatedRowId(updatedPosition.id);
+      setTimeout(() => setUpdatedRowId(null), 1000); // Reset after 1 second
+    };
+
+    eventSource.onerror = (err) => {
+      console.error("SSE connection error:", err);
+      eventSource.close();
+    };
+
+    // Cleanup on component unmount
+    return () => eventSource.close();
   }, []);
 
   if (loading) {
@@ -85,5 +127,40 @@ export default function data() {
     { name: "lastKnownPrice", align: "center" },
   ];
 
-  return { columns, rows };
+  // Add flashing effect to rows
+  const formattedRows = rows.map((row) => ({
+    ...row,
+    quantity: (
+      <SoftTypography
+        variant="button"
+        color="text"
+        fontWeight="medium"
+        className={row.id === updatedRowId ? "flash-green" : ""}
+      >
+        {row.quantity}
+      </SoftTypography>
+    ),
+    averagePrice: (
+      <SoftTypography
+        variant="button"
+        color="text"
+        fontWeight="medium"
+        className={row.id === updatedRowId ? "flash-green" : ""}
+      >
+        ${row.averagePrice}
+      </SoftTypography>
+    ),
+    lastKnownPrice: (
+      <SoftTypography
+        variant="button"
+        color="text"
+        fontWeight="medium"
+        className={row.id === updatedRowId ? "flash-green" : ""}
+      >
+        ${row.lastKnownPrice}
+      </SoftTypography>
+    ),
+  }));
+
+  return { columns, rows: formattedRows };
 }
