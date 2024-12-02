@@ -49,6 +49,14 @@ export default function data() {
     };
 
     fetchData();
+
+    // let intervalId;
+    // intervalId = setInterval(fetchData, 3000); // Fetch every 1 second
+
+    // // Cleanup interval on unmount
+    // return () => clearInterval(intervalId);
+
+
   }, []);
 
   if (loading) {
